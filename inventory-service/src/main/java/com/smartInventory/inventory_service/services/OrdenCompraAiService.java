@@ -3,8 +3,11 @@ package com.smartInventory.inventory_service.services;
 import com.smartInventory.inventory_service.models.EstadoOrdenCompra;
 import com.smartInventory.inventory_service.models.OrdenCompraAi;
 import com.smartInventory.inventory_service.repositories.OrdenCompraAiRepository;
+import com.smartInventory.inventory_service.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -13,8 +16,16 @@ import java.util.List;
 public class OrdenCompraAiService {
 
     private final OrdenCompraAiRepository repository;
+    private final UsuarioRepository usuarioRepository;
 
     public OrdenCompraAi saveOrUpdate(OrdenCompraAi orden) {
+        if (orden.getUsuarioAprobador() != null && orden.getUsuarioAprobador().getId() != null) {
+            Long usuarioId = orden.getUsuarioAprobador().getId();
+            if (!usuarioRepository.existsById(usuarioId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "usuarioAprobador.id no existe: " + usuarioId);
+            }
+        }
         return repository.save(orden);
     }
 

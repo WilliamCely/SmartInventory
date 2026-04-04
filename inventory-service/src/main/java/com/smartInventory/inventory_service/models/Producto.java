@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,8 +31,8 @@ public class Producto {
     private String descripcion;
 
     @PositiveOrZero
-    @Column(nullable = false)
-    private Double precio;
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal precio;
 
     @Min(0)
     @Column(name = "stock_actual", nullable = false)

@@ -14,6 +14,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "detalle_orden_compra")
 @Data
@@ -38,5 +40,5 @@ public class DetalleOrdenCompra {
     private Integer cantidadSugerida;
 
     @Column(name = "costo_estimado", precision = 12, scale = 2)
-    private Double costoEstimado;
+    private BigDecimal costoEstimado;
 }

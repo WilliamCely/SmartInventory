@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -37,6 +39,7 @@ public class OrdenCompraAi {
     @Column(name = "prompt_usado", columnDefinition = "TEXT")
     private String promptUsado;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "respuesta_raw_json", columnDefinition = "jsonb")
     private String respuestaRawJson;
 
