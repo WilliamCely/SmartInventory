@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './components/Dashboard'
 import LoginPage from './pages/LoginPage'
 import ModulePlaceholder from './pages/ModulePlaceholder'
+import MovimientosPage from './pages/MovimientosPage'
 import ProductosPage from './pages/ProductosPage'
 
 function App() {
@@ -33,12 +34,7 @@ function App() {
         />
         <Route
           path="movimientos"
-          element={
-            <ModulePlaceholder
-              title="Modulo Movimientos"
-              description="Pendiente de integrar tabla filtrable y formularios de entradas/salidas."
-            />
-          }
+          element={<MovimientosPage />}
         />
         <Route
           path="usuarios"

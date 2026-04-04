@@ -26,3 +26,34 @@ export interface SugerenciaIA {
   prioridad?: string
   razon?: string
 }
+
+export type TipoMovimiento = 'ENTRADA' | 'SALIDA'
+
+export interface MovimientoProductoRef {
+  id: number
+  sku?: string
+  nombre?: string
+  stockActual?: number
+}
+
+export interface MovimientoUsuarioRef {
+  id: number
+  username?: string
+  role?: string
+}
+
+export interface MovimientoInventario {
+  id?: number
+  producto: MovimientoProductoRef
+  usuario: MovimientoUsuarioRef
+  tipo: TipoMovimiento
+  cantidad: number
+  fecha?: string
+}
+
+export interface MovimientoInventarioPayload {
+  producto: { id: number }
+  usuario: { id: number }
+  tipo: TipoMovimiento
+  cantidad: number
+}
