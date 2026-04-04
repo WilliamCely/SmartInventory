@@ -13,5 +13,11 @@ services:
       - ./init-db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
 
+  inventory-ui:
+    build: ./smart-inventory-ui
+    container_name: inventory-ui
+    ports:
+      - "3000:80"
+
 volumes:
   postgres_data:

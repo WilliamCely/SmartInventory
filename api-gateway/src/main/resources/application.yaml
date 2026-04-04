@@ -1,23 +1,44 @@
 spring:
   application:
     name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # Ruta para el Microservicio de Autenticacion
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/v1/auth/**
+
+        # Ruta para el Microservicio de Inventario
+        - id: inventory-service
+          uri: lb://inventory-service # "lb://" usa Load Balancer de Eureka
+          predicates:
+            - Path=/api/v1/inventory/** # Cualquier ruta que empiece así
+
+        # Ruta para el Microservicio de IA
+        - id: ai-service
+          uri: lb://ai-service
+          predicates:
+            - Path=/api/v1/ai/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - http://localhost:3000
+              - http://localhost:5173
+              - http://127.0.0.1:5173
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
   threads:
     virtual:
       enabled: true # Soporte Java 21 para manejar miles de peticiones
-    cloud:
-      gateway:
-        routes:
-          # Ruta para el Microservicio de Inventario
-          - id: inventory-service
-            uri: lb://inventory-service # "lb://" usa Load Balancer de Eureka
-            predicates:
-              - Path=/api/v1/inventory/** # Cualquier ruta que empiece así
-
-          # Ruta para el Microservicio de IA (si decides separarlo)
-          - id: ai-service
-            uri: lb://ai-service
-            predicates:
-              - Path=/api/v1/ai/**
 server:
   port: 8080 # Puerto estándar para el punto de entrada
 eureka:

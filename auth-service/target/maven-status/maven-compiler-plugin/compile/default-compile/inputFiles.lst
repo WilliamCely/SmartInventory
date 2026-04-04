@@ -1,0 +1,12 @@
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\AuthServiceApplication.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\config\SecurityConfig.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\config\UserSeedConfig.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\controllers\AuthController.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\dto\auth\AuthLoginRequest.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\dto\auth\AuthLoginResponse.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\dto\auth\AuthUserResponse.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\models\RolUsuario.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\models\Usuario.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\repositories\UsuarioRepository.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\security\JwtService.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\services\AuthService.java
