@@ -1,0 +1,433 @@
+{
+  "info": {
+    "_postman_id": "9dba0ef1-5d73-4f58-bf10-a8263e69aa9d",
+    "name": "SmartInventory - Inventory Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "categoriaId",
+      "value": "1"
+    },
+    {
+      "key": "productoId",
+      "value": "1"
+    },
+    {
+      "key": "usuarioId",
+      "value": "1"
+    },
+    {
+      "key": "movimientoId",
+      "value": "1"
+    },
+    {
+      "key": "ordenId",
+      "value": "1"
+    },
+    {
+      "key": "detalleId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Get All Categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/categorias"
+          }
+        },
+        {
+          "name": "Get Categoria By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/categorias/{{categoriaId}}"
+          }
+        },
+        {
+          "name": "Create Categoria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Bebidas\",\n  \"descripcion\": \"Productos liquidos\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/categorias"
+          }
+        },
+        {
+          "name": "Update Categoria",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Bebidas Frias\",\n  \"descripcion\": \"Bebidas refrigeradas\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/categorias/{{categoriaId}}"
+          }
+        },
+        {
+          "name": "Delete Categoria",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/categorias/{{categoriaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Get All Productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory"
+          }
+        },
+        {
+          "name": "Create Producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"SKU-001\",\n  \"nombre\": \"Gaseosa Cola 2L\",\n  \"descripcion\": \"Botella 2 litros\",\n  \"precio\": 12.50,\n  \"stockActual\": 8,\n  \"stockMinimo\": 5,\n  \"categoria\": {\n    \"id\": {{categoriaId}}\n  }\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory"
+          }
+        },
+        {
+          "name": "Update Producto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"SKU-001\",\n  \"nombre\": \"Gaseosa Cola 2L\",\n  \"descripcion\": \"Botella 2 litros - promo\",\n  \"precio\": 11.90,\n  \"stockActual\": 12,\n  \"stockMinimo\": 5,\n  \"categoria\": {\n    \"id\": {{categoriaId}}\n  }\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/{{productoId}}"
+          }
+        },
+        {
+          "name": "Delete Producto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/{{productoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Get All Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/usuarios"
+          }
+        },
+        {
+          "name": "Get Usuario By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/usuarios/{{usuarioId}}"
+          }
+        },
+        {
+          "name": "Create Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"passwordHash\": \"$2a$10$examplehash\",\n  \"rol\": \"ADMIN\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/usuarios"
+          }
+        },
+        {
+          "name": "Update Usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"bodeguero1\",\n  \"passwordHash\": \"$2a$10$updatedhash\",\n  \"rol\": \"BODEGUERO\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/usuarios/{{usuarioId}}"
+          }
+        },
+        {
+          "name": "Delete Usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/usuarios/{{usuarioId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Movimientos",
+      "item": [
+        {
+          "name": "Get All Movimientos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/movimientos"
+          }
+        },
+        {
+          "name": "Get Movimiento By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/movimientos/{{movimientoId}}"
+          }
+        },
+        {
+          "name": "Get Movimientos By Producto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/movimientos/producto/{{productoId}}"
+          }
+        },
+        {
+          "name": "Create Movimiento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"producto\": {\n    \"id\": {{productoId}}\n  },\n  \"usuario\": {\n    \"id\": {{usuarioId}}\n  },\n  \"tipo\": \"ENTRADA\",\n  \"cantidad\": 10\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/movimientos"
+          }
+        },
+        {
+          "name": "Update Movimiento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"producto\": {\n    \"id\": {{productoId}}\n  },\n  \"usuario\": {\n    \"id\": {{usuarioId}}\n  },\n  \"tipo\": \"SALIDA\",\n  \"cantidad\": 2\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/movimientos/{{movimientoId}}"
+          }
+        },
+        {
+          "name": "Delete Movimiento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/movimientos/{{movimientoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ordenes Compra AI",
+      "item": [
+        {
+          "name": "Get All Ordenes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/ordenes-compra"
+          }
+        },
+        {
+          "name": "Get Ordenes By Estado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/ordenes-compra?estado=SUGERIDA"
+          }
+        },
+        {
+          "name": "Get Orden By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/ordenes-compra/{{ordenId}}"
+          }
+        },
+        {
+          "name": "Create Orden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"promptUsado\": \"Analiza stock de SKU-001\",\n  \"respuestaRawJson\": \"{\\\"cantidad_sugerida\\\":15,\\\"prioridad\\\":\\\"ALTA\\\"}\",\n  \"estado\": \"SUGERIDA\",\n  \"usuarioAprobador\": {\n    \"id\": {{usuarioId}}\n  }\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/ordenes-compra"
+          }
+        },
+        {
+          "name": "Update Orden",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"promptUsado\": \"Analiza stock de SKU-001\",\n  \"respuestaRawJson\": \"{\\\"cantidad_sugerida\\\":20,\\\"prioridad\\\":\\\"MEDIA\\\"}\",\n  \"estado\": \"APROBADA\",\n  \"usuarioAprobador\": {\n    \"id\": {{usuarioId}}\n  }\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/ordenes-compra/{{ordenId}}"
+          }
+        },
+        {
+          "name": "Delete Orden",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/ordenes-compra/{{ordenId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Detalle Orden Compra",
+      "item": [
+        {
+          "name": "Get All Detalles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/detalles-orden"
+          }
+        },
+        {
+          "name": "Get Detalles By Orden",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/detalles-orden?ordenId={{ordenId}}"
+          }
+        },
+        {
+          "name": "Get Detalle By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/detalles-orden/{{detalleId}}"
+          }
+        },
+        {
+          "name": "Create Detalle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orden\": {\n    \"id\": {{ordenId}}\n  },\n  \"producto\": {\n    \"id\": {{productoId}}\n  },\n  \"cantidadSugerida\": 15,\n  \"costoEstimado\": 187.50\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/detalles-orden"
+          }
+        },
+        {
+          "name": "Update Detalle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orden\": {\n    \"id\": {{ordenId}}\n  },\n  \"producto\": {\n    \"id\": {{productoId}}\n  },\n  \"cantidadSugerida\": 20,\n  \"costoEstimado\": 250.00\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/inventory/detalles-orden/{{detalleId}}"
+          }
+        },
+        {
+          "name": "Delete Detalle",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/inventory/detalles-orden/{{detalleId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

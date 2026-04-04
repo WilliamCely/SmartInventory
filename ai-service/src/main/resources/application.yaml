@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: ai-service
+  threads:
+    virtual:
+      enabled: true
+    ai:
+      vertex:
+        ai:
+          gemini:
+            project-id: ${GOOGLE_CLOUD_PROJECT_ID}
+            location: us-central1
+            model: gemini-1.5-flash
+server:
+  port: 8082
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/

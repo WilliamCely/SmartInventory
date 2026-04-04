@@ -1,17 +1,18 @@
 spring:
   application:
     name: inventory-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5435/smart_inventory}
+    username: ${SPRING_DATASOURCE_USERNAME:admin_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:secret_password_2026}
+  jpa:
+    hibernate:
+      ddl-auto: update # Crea las tablas automáticamente si no existen
+    show-sql: true
   threads:
     virtual:
       enabled: true # Vital para las llamadas de larga duración a la IA
-    datasource:
-      url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/smart_inventory}
-      username: ${SPRING_DATASOURCE_USERNAME:user}
-      password: ${SPRING_DATASOURCE_PASSWORD:password}
-    jpa:
-      hibernate:
-        ddl-auto: update # Crea las tablas automáticamente si no existen
-      show-sql: true
+
 server:
   port: 8081
 eureka:
