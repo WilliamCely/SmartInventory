@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: api-gateway
+  threads:
+    virtual:
+      enabled: true # Soporte Java 21 para manejar miles de peticiones
+    cloud:
+      gateway:
+        routes:
+          # Ruta para el Microservicio de Inventario
+          - id: inventory-service
+            uri: lb://inventory-service # "lb://" usa Load Balancer de Eureka
+            predicates:
+              - Path=/api/v1/inventory/** # Cualquier ruta que empiece así
+
+          # Ruta para el Microservicio de IA (si decides separarlo)
+          - id: ai-service
+            uri: lb://ai-service
+            predicates:
+              - Path=/api/v1/ai/**
+server:
+  port: 8080 # Puerto estándar para el punto de entrada
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/ # Registro en Eureka

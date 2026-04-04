@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: inventory-service
+  threads:
+    virtual:
+      enabled: true # Vital para las llamadas de larga duración a la IA
+    datasource:
+      url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/smart_inventory}
+      username: ${SPRING_DATASOURCE_USERNAME:user}
+      password: ${SPRING_DATASOURCE_PASSWORD:password}
+    jpa:
+      hibernate:
+        ddl-auto: update # Crea las tablas automáticamente si no existen
+      show-sql: true
+server:
+  port: 8081
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
