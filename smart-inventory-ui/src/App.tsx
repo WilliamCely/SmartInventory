@@ -1,10 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import AppLayout from './components/AppLayout'
+import OrdersRouteErrorBoundary from './components/OrdersRouteErrorBoundary'
 import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './components/Dashboard'
 import LoginPage from './pages/LoginPage'
-import ModulePlaceholder from './pages/ModulePlaceholder'
 import MovimientosPage from './pages/MovimientosPage'
+import OrdenesPage from './pages/OrdenesPage'
 import ProductosPage from './pages/ProductosPage'
 import UsuariosPage from './pages/UsuariosPage'
 
@@ -27,20 +28,13 @@ function App() {
         <Route
           path="ordenes"
           element={
-            <ModulePlaceholder
-              title="Modulo Ordenes AI"
-              description="Pendiente de conectar UI avanzada con ordenes_compra_ai y detalle_orden_compra."
-            />
+            <OrdersRouteErrorBoundary>
+              <OrdenesPage />
+            </OrdersRouteErrorBoundary>
           }
         />
-        <Route
-          path="movimientos"
-          element={<MovimientosPage />}
-        />
-        <Route
-          path="usuarios"
-          element={<UsuariosPage />}
-        />
+        <Route path="movimientos" element={<MovimientosPage />} />
+        <Route path="usuarios" element={<UsuariosPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/app" replace />} />

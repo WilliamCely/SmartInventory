@@ -4,6 +4,7 @@ import com.smartInventory.inventory_service.models.EstadoOrdenCompra;
 import com.smartInventory.inventory_service.models.OrdenCompraAi;
 import com.smartInventory.inventory_service.repositories.OrdenCompraAiRepository;
 import com.smartInventory.inventory_service.repositories.UsuarioRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,19 @@ public class OrdenCompraAiService {
 
     private final OrdenCompraAiRepository repository;
     private final UsuarioRepository usuarioRepository;
+    private final ObjectMapper objectMapper;
 
     public OrdenCompraAi saveOrUpdate(OrdenCompraAi orden) {
+        if (orden.getRespuestaRawJson() != null && !orden.getRespuestaRawJson().isBlank()) {
+            try {
+                // Validate jsonb payload early to avoid database-level 500 errors.
+                objectMapper.readTree(orden.getRespuestaRawJson());
+            } catch (Exception ex) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "respuestaRawJson debe ser un JSON valido");
+            }
+        }
+
         if (orden.getUsuarioAprobador() != null && orden.getUsuarioAprobador().getId() != null) {
             Long usuarioId = orden.getUsuarioAprobador().getId();
             if (!usuarioRepository.existsById(usuarioId)) {

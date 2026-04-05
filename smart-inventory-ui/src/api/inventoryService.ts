@@ -1,8 +1,13 @@
 import api from './axiosConfig'
 import type {
   Categoria,
+  DetalleOrdenCompra,
+  DetalleOrdenCompraPayload,
+  EstadoOrdenCompra,
   MovimientoInventario,
   MovimientoInventarioPayload,
+  OrdenCompraAi,
+  OrdenCompraAiPayload,
   Producto,
   StockDataDTO,
   UsuarioOperativo,
@@ -25,6 +30,26 @@ export const inventoryService = {
   updateMovimiento: (id: number, movimiento: MovimientoInventarioPayload) =>
     api.put<MovimientoInventario>(`/inventory/movimientos/${id}`, movimiento),
   deleteMovimiento: (id: number) => api.delete(`/inventory/movimientos/${id}`),
+
+  getOrdenesCompra: (estado?: EstadoOrdenCompra) =>
+    api.get<OrdenCompraAi[]>('/inventory/ordenes-compra', {
+      params: estado ? { estado } : undefined,
+    }),
+  createOrdenCompra: (orden: OrdenCompraAiPayload) =>
+    api.post<OrdenCompraAi>('/inventory/ordenes-compra', orden),
+  updateOrdenCompra: (id: number, orden: OrdenCompraAiPayload) =>
+    api.put<OrdenCompraAi>(`/inventory/ordenes-compra/${id}`, orden),
+  deleteOrdenCompra: (id: number) => api.delete(`/inventory/ordenes-compra/${id}`),
+
+  getDetallesOrden: (ordenId?: number) =>
+    api.get<DetalleOrdenCompra[]>('/inventory/detalles-orden', {
+      params: ordenId ? { ordenId } : undefined,
+    }),
+  createDetalleOrden: (detalle: DetalleOrdenCompraPayload) =>
+    api.post<DetalleOrdenCompra>('/inventory/detalles-orden', detalle),
+  updateDetalleOrden: (id: number, detalle: DetalleOrdenCompraPayload) =>
+    api.put<DetalleOrdenCompra>(`/inventory/detalles-orden/${id}`, detalle),
+  deleteDetalleOrden: (id: number) => api.delete(`/inventory/detalles-orden/${id}`),
 
   getUsuarios: () => api.get<UsuarioOperativo[]>('/inventory/usuarios'),
   createUsuario: (usuario: UsuarioOperativo) =>

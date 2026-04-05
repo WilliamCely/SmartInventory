@@ -66,3 +66,47 @@ export interface UsuarioOperativo {
   passwordHash: string
   rol: RolUsuario
 }
+
+export type EstadoOrdenCompra = 'SUGERIDA' | 'APROBADA' | 'RECHAZADA'
+
+export interface UsuarioRef {
+  id: number
+  username?: string
+  rol?: RolUsuario
+}
+
+export interface OrdenCompraAi {
+  id?: number
+  fechaGeneracion?: string
+  promptUsado?: string
+  respuestaRawJson?: string
+  estado: EstadoOrdenCompra
+  usuarioAprobador?: UsuarioRef
+}
+
+export interface OrdenCompraAiPayload {
+  fechaGeneracion?: string
+  promptUsado?: string
+  respuestaRawJson?: string
+  estado: EstadoOrdenCompra
+  usuarioAprobador?: { id: number }
+}
+
+export interface DetalleOrdenCompra {
+  id?: number
+  orden: { id: number }
+  producto: {
+    id: number
+    nombre?: string
+    sku?: string
+  }
+  cantidadSugerida: number
+  costoEstimado?: string
+}
+
+export interface DetalleOrdenCompraPayload {
+  orden: { id: number }
+  producto: { id: number }
+  cantidadSugerida: number
+  costoEstimado?: string
+}
