@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+*.json
+!pom.xml
+!package.json
