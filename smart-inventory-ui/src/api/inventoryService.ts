@@ -5,6 +5,7 @@ import type {
   MovimientoInventarioPayload,
   Producto,
   StockDataDTO,
+  UsuarioOperativo,
 } from '../types/inventory'
 
 export const inventoryService = {
@@ -24,6 +25,13 @@ export const inventoryService = {
   updateMovimiento: (id: number, movimiento: MovimientoInventarioPayload) =>
     api.put<MovimientoInventario>(`/inventory/movimientos/${id}`, movimiento),
   deleteMovimiento: (id: number) => api.delete(`/inventory/movimientos/${id}`),
+
+  getUsuarios: () => api.get<UsuarioOperativo[]>('/inventory/usuarios'),
+  createUsuario: (usuario: UsuarioOperativo) =>
+    api.post<UsuarioOperativo>('/inventory/usuarios', usuario),
+  updateUsuario: (id: number, usuario: UsuarioOperativo) =>
+    api.put<UsuarioOperativo>(`/inventory/usuarios/${id}`, usuario),
+  deleteUsuario: (id: number) => api.delete(`/inventory/usuarios/${id}`),
 
   analizarConIA: (data: StockDataDTO) => api.post('/ai/analyze-stock', data),
 }

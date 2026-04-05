@@ -57,3 +57,12 @@ export interface MovimientoInventarioPayload {
   tipo: TipoMovimiento
   cantidad: number
 }
+
+export type RolUsuario = 'ADMIN' | 'BODEGUERO'
+
+export interface UsuarioOperativo {
+  id?: number
+  username: string
+  passwordHash: string
+  rol: RolUsuario
+}

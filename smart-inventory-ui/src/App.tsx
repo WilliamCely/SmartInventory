@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import ModulePlaceholder from './pages/ModulePlaceholder'
 import MovimientosPage from './pages/MovimientosPage'
 import ProductosPage from './pages/ProductosPage'
+import UsuariosPage from './pages/UsuariosPage'
 
 function App() {
   return (
@@ -38,12 +39,7 @@ function App() {
         />
         <Route
           path="usuarios"
-          element={
-            <ModulePlaceholder
-              title="Modulo Usuarios"
-              description="Pendiente de integrar gestion de usuarios y roles operativos."
-            />
-          }
+          element={<UsuariosPage />}
         />
       </Route>
 
