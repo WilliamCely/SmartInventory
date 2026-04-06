@@ -125,6 +125,26 @@ function badgeClass(estado?: EstadoOrdenCompra | string) {
   return 'bg-amber-50 text-amber-700'
 }
 
+function safeArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : []
+}
+
+function safeLowerText(value: unknown): string {
+  return String(value ?? '').toLowerCase()
+}
+
+function displayText(value: unknown, fallback = '-'): string {
+  if (value === null || value === undefined || value === '') return fallback
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value)
+    } catch {
+      return fallback
+    }
+  }
+  return String(value)
+}
+
 function OrdenesPage() {
   const [ordenes, setOrdenes] = useState<OrdenCompraAi[]>([])
   const [detalles, setDetalles] = useState<DetalleOrdenCompra[]>([])
@@ -151,25 +171,28 @@ function OrdenesPage() {
       inventoryService.getProductos(),
       inventoryService.getUsuarios(),
     ])
-    setProductos(resProductos.data)
-    setUsuarios(resUsuarios.data)
+    setProductos(safeArray<Producto>(resProductos.data))
+    setUsuarios(safeArray<UsuarioOperativo>(resUsuarios.data))
   }
 
   const cargarOrdenes = async () => {
     const res = await inventoryService.getOrdenesCompra(
       estadoFiltro === 'TODOS' ? undefined : estadoFiltro,
     )
-    setOrdenes(res.data)
+    const ordenesResponse = safeArray<OrdenCompraAi>(res.data)
+    setOrdenes(ordenesResponse)
 
-    if (!selectedOrdenId && res.data.length > 0) {
-      setSelectedOrdenId(Number(res.data[0].id))
+    if (!selectedOrdenId && ordenesResponse.length > 0) {
+      setSelectedOrdenId(Number(ordenesResponse[0].id))
     }
 
     if (
       selectedOrdenId &&
-      !res.data.some((orden) => Number(orden.id) === selectedOrdenId)
+      !ordenesResponse.some((orden) => Number(orden.id) === selectedOrdenId)
     ) {
-      setSelectedOrdenId(res.data.length > 0 ? Number(res.data[0].id) : null)
+      setSelectedOrdenId(
+        ordenesResponse.length > 0 ? Number(ordenesResponse[0].id) : null,
+      )
     }
   }
 
@@ -179,7 +202,7 @@ function OrdenesPage() {
       return
     }
     const res = await inventoryService.getDetallesOrden(ordenId)
-    setDetalles(res.data)
+    setDetalles(safeArray<DetalleOrdenCompra>(res.data))
   }
 
   const cargarTodo = async () => {
@@ -213,8 +236,8 @@ function OrdenesPage() {
         if (!texto) return true
         return (
           String(orden.id ?? '').includes(texto) ||
-          (orden.promptUsado ?? '').toLowerCase().includes(texto) ||
-          (orden.estado ?? '').toLowerCase().includes(texto)
+          safeLowerText(orden.promptUsado).includes(texto) ||
+          safeLowerText(orden.estado).includes(texto)
         )
       })
       .slice()
@@ -257,7 +280,7 @@ function OrdenesPage() {
   const iniciarEdicionDetalle = (detalle: DetalleOrdenCompra) => {
     setEditingDetalleId(Number(detalle.id))
     setDetalleForm({
-      productoId: String(detalle.producto.id),
+      productoId: detalle.producto?.id ? String(detalle.producto.id) : '',
       cantidadSugerida: String(detalle.cantidadSugerida),
       costoEstimado: detalle.costoEstimado ?? '',
     })
@@ -485,6 +508,9 @@ function OrdenesPage() {
 
       const createdOrden = await inventoryService.createOrdenCompra(ordenPayload)
       const ordenId = Number(createdOrden.data.id)
+      if (!Number.isFinite(ordenId) || ordenId <= 0) {
+        throw new Error('El backend no devolvio un id de orden valido')
+      }
 
       for (const item of sugerencias) {
         const detallePayload: DetalleOrdenCompraPayload = {
@@ -601,9 +627,9 @@ function OrdenesPage() {
                   className="w-full rounded-xl border border-slate-300 px-3 py-2"
                 >
                   <option value="">Sin aprobador</option>
-                  {usuarios.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.username} ({u.rol})
+                  {usuarios.map((u, index) => (
+                    <option key={u.id ?? `u-${index}`} value={u.id}>
+                      {displayText(u.username, 'usuario')} ({displayText(u.rol, 'N/D')})
                     </option>
                   ))}
                 </select>
@@ -682,9 +708,9 @@ function OrdenesPage() {
                   required
                 >
                   <option value="">Selecciona un producto</option>
-                  {productos.map((producto) => (
-                    <option key={producto.id} value={producto.id}>
-                      {producto.nombre} - {producto.sku}
+                  {productos.map((producto, index) => (
+                    <option key={producto.id ?? `p-${index}`} value={producto.id}>
+                      {displayText(producto.nombre, 'Producto')} - {displayText(producto.sku, 'SIN-SKU')}
                     </option>
                   ))}
                 </select>
@@ -789,22 +815,26 @@ function OrdenesPage() {
                       ordenesFiltradas.map((orden) => {
                         const ordenId = Number(orden.id)
                         const active = selectedOrdenId === ordenId
+                        const estadoText = displayText(orden.estado, 'SUGERIDA')
                         return (
                           <tr
                             key={orden.id}
                             className={active ? 'bg-blue-50/60' : ''}
                           >
-                            <td className="px-4 py-3 font-semibold text-slate-900">#{orden.id}</td>
+                            <td className="px-4 py-3 font-semibold text-slate-900">#{displayText(orden.id, 'N/D')}</td>
                             <td className="px-4 py-3 text-slate-600">{formatDate(orden.fechaGeneracion)}</td>
                             <td className="px-4 py-3">
                               <span
                                 className={`rounded-full px-2.5 py-1 text-xs font-semibold ${badgeClass(orden.estado)}`}
                               >
-                                {orden.estado}
+                                {estadoText}
                               </span>
                             </td>
                             <td className="px-4 py-3 text-slate-600">
-                              {orden.usuarioAprobador?.username ?? orden.usuarioAprobador?.id ?? '-'}
+                              {displayText(
+                                orden.usuarioAprobador?.username ?? orden.usuarioAprobador?.id,
+                                '-',
+                              )}
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex gap-2">
@@ -883,12 +913,15 @@ function OrdenesPage() {
                     ) : (
                       detalles.map((detalle) => (
                         <tr key={detalle.id}>
-                          <td className="px-4 py-3 text-slate-600">#{detalle.id}</td>
+                          <td className="px-4 py-3 text-slate-600">#{displayText(detalle.id, 'N/D')}</td>
                           <td className="px-4 py-3 font-medium text-slate-900">
-                            {detalle.producto?.nombre ?? `Producto #${detalle.producto?.id ?? 'N/D'}`}
+                            {displayText(
+                              detalle.producto?.nombre,
+                              `Producto #${displayText(detalle.producto?.id, 'N/D')}`,
+                            )}
                           </td>
-                          <td className="px-4 py-3 text-slate-700">{detalle.cantidadSugerida}</td>
-                          <td className="px-4 py-3 text-slate-700">{detalle.costoEstimado ?? '-'}</td>
+                          <td className="px-4 py-3 text-slate-700">{displayText(detalle.cantidadSugerida, '0')}</td>
+                          <td className="px-4 py-3 text-slate-700">{displayText(detalle.costoEstimado, '-')}</td>
                           <td className="px-4 py-3">
                             <div className="flex gap-2">
                               <button

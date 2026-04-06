@@ -6,6 +6,7 @@ interface Props {
 
 interface State {
   hasError: boolean
+  message?: string
 }
 
 class OrdersRouteErrorBoundary extends Component<Props, State> {
@@ -13,6 +14,11 @@ class OrdersRouteErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError() {
     return { hasError: true }
+  }
+
+  componentDidCatch(error: Error, errorInfo: unknown) {
+    console.error('OrdersRouteErrorBoundary:', error, errorInfo)
+    this.setState({ message: error?.message })
   }
 
   render() {
@@ -23,6 +29,9 @@ class OrdersRouteErrorBoundary extends Component<Props, State> {
           <p className="mt-2 text-sm">
             La vista se protegió para evitar una pantalla en blanco. Vuelve a cargar la página.
           </p>
+          {this.state.message && (
+            <p className="mt-2 text-xs text-red-700/80">Detalle: {this.state.message}</p>
+          )}
         </div>
       )
     }

@@ -28,6 +28,7 @@ function ProductosPage() {
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   const [search, setSearch] = useState('')
   const [soloCritico, setSoloCritico] = useState(false)
@@ -129,17 +130,27 @@ function ProductosPage() {
   }
 
   const analizar = async (p: Producto) => {
+    setError(null)
+    setSuccess(null)
+
     try {
       const res = await inventoryService.analizarConIA({
         nombre: p.nombre,
         actual: p.stockActual,
         minimo: p.stockMinimo,
       })
+
       const contenido =
         typeof res.data === 'string' ? res.data : JSON.stringify(res.data)
+      setSuccess(`Analisis IA completado para ${p.nombre}`)
       window.alert(`Sugerencia IA:\n${contenido}`)
-    } catch {
-      window.alert('No fue posible analizar con IA')
+    } catch (err: any) {
+      const backendMessage =
+        err?.response?.data?.message ??
+        err?.response?.data?.error ??
+        'No fue posible analizar con IA'
+
+      setError(`No fue posible analizar con IA: ${backendMessage}`)
     }
   }
 
@@ -283,6 +294,12 @@ function ProductosPage() {
         {error && (
           <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-700">
             {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-700">
+            {success}
           </div>
         )}
 

@@ -22,7 +22,7 @@ function AppLayout() {
   const { user, logout } = useAuth()
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
+    <div className="notranslate min-h-screen bg-slate-100 text-slate-900" translate="no">
       <div className="mx-auto grid min-h-screen max-w-7xl grid-cols-1 lg:grid-cols-[260px_1fr]">
         <aside className="border-r border-slate-200 bg-slate-900 px-4 py-6 text-slate-100">
           <div className="mb-8 flex items-center gap-3 px-2">

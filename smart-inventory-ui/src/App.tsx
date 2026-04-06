@@ -37,7 +37,7 @@ function App() {
         <Route path="usuarios" element={<UsuariosPage />} />
       </Route>
 
-      <Route path="/" element={<Navigate to="/app" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/app" replace />} />
     </Routes>
   )

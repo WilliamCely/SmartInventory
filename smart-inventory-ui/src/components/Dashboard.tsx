@@ -31,8 +31,13 @@ function Dashboard() {
       const respuesta =
         typeof res.data === 'string' ? res.data : JSON.stringify(res.data)
       window.alert(`Sugerencia de Gemini:\n${respuesta}`)
-    } catch {
-      window.alert('No se pudo obtener sugerencia de IA')
+    } catch (err: any) {
+      const backendMessage =
+        err?.response?.data?.message ??
+        err?.response?.data?.error ??
+        'No se pudo obtener sugerencia de IA'
+
+      window.alert(`No se pudo obtener sugerencia de IA: ${backendMessage}`)
     }
   }
 
