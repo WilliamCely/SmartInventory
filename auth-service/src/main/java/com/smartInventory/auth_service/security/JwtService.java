@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.Map;
 
 @Service
-public class JwtService {
+public class JwtService implements JwtTokenService {
 
     private final SecretKey secretKey;
     private final long expirationMs;
@@ -25,6 +25,7 @@ public class JwtService {
         this.expirationMs = expirationMs;
     }
 
+    @Override
     public String generateToken(String username, String role) {
         Instant now = Instant.now();
         return Jwts.builder()

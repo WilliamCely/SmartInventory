@@ -1,7 +1,7 @@
 package com.smartInventory.inventory_service.controllers;
 
 import com.smartInventory.inventory_service.models.DetalleOrdenCompra;
-import com.smartInventory.inventory_service.services.DetalleOrdenCompraService;
+import com.smartInventory.inventory_service.services.DetalleOrdenCompraServiceContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DetalleOrdenCompraController {
 
-    private final DetalleOrdenCompraService service;
+    private final DetalleOrdenCompraServiceContract service;
 
     @GetMapping
     public ResponseEntity<List<DetalleOrdenCompra>> getAll(@RequestParam(required = false) Long ordenId) {

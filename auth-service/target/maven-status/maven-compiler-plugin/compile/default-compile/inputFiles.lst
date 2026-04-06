@@ -9,4 +9,6 @@ D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\mod
 D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\models\Usuario.java
 D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\repositories\UsuarioRepository.java
 D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\security\JwtService.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\security\JwtTokenService.java
 D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\services\AuthService.java
+D:\SmartInventory\auth-service\src\main\java\com\smartInventory\auth_service\services\AuthServiceContract.java

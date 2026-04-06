@@ -14,12 +14,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OrdenCompraAiService {
+public class OrdenCompraAiService implements OrdenCompraAiServiceContract {
 
     private final OrdenCompraAiRepository repository;
     private final UsuarioRepository usuarioRepository;
     private final ObjectMapper objectMapper;
 
+    @Override
     public OrdenCompraAi saveOrUpdate(OrdenCompraAi orden) {
         if (orden.getRespuestaRawJson() != null && !orden.getRespuestaRawJson().isBlank()) {
             try {
@@ -41,19 +42,23 @@ public class OrdenCompraAiService {
         return repository.save(orden);
     }
 
+    @Override
     public List<OrdenCompraAi> findAll() {
         return repository.findAll();
     }
 
+    @Override
     public OrdenCompraAi findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Orden de compra no encontrada"));
     }
 
+    @Override
     public List<OrdenCompraAi> findByEstado(EstadoOrdenCompra estado) {
         return repository.findByEstado(estado);
     }
 
+    @Override
     public void delete(Long id) {
         repository.deleteById(id);
     }

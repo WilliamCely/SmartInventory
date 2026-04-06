@@ -1,7 +1,7 @@
 package com.smartInventory.inventory_service.controllers;
 
 import com.smartInventory.inventory_service.models.Usuario;
-import com.smartInventory.inventory_service.services.UsuarioService;
+import com.smartInventory.inventory_service.services.UsuarioServiceContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UsuarioController {
 
-    private final UsuarioService service;
+    private final UsuarioServiceContract service;
 
     @GetMapping
     public ResponseEntity<List<Usuario>> getAll() {

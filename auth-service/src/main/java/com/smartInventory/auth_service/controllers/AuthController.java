@@ -2,7 +2,7 @@ package com.smartInventory.auth_service.controllers;
 
 import com.smartInventory.auth_service.dto.auth.AuthLoginRequest;
 import com.smartInventory.auth_service.dto.auth.AuthLoginResponse;
-import com.smartInventory.auth_service.services.AuthService;
+import com.smartInventory.auth_service.services.AuthServiceContract;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthServiceContract authService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthServiceContract authService) {
         this.authService = authService;
     }
 

@@ -1,7 +1,7 @@
 package com.smartInventory.inventory_service.controllers;
 
 import com.smartInventory.inventory_service.models.MovimientoInventario;
-import com.smartInventory.inventory_service.services.MovimientoInventarioService;
+import com.smartInventory.inventory_service.services.MovimientoInventarioServiceContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MovimientoInventarioController {
 
-    private final MovimientoInventarioService service;
+    private final MovimientoInventarioServiceContract service;
 
     @GetMapping
     public ResponseEntity<List<MovimientoInventario>> getAll() {

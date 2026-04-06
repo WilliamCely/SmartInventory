@@ -1,7 +1,7 @@
 package com.smartInventory.inventory_service.controllers;
 
 import com.smartInventory.inventory_service.models.Categoria;
-import com.smartInventory.inventory_service.services.CategoriaService;
+import com.smartInventory.inventory_service.services.CategoriaServiceContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoriaController {
 
-    private final CategoriaService service;
+    private final CategoriaServiceContract service;
 
     @GetMapping
     public ResponseEntity<List<Categoria>> getAll() {

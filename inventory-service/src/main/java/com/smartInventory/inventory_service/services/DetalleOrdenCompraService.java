@@ -13,12 +13,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DetalleOrdenCompraService {
+public class DetalleOrdenCompraService implements DetalleOrdenCompraServiceContract {
 
     private final DetalleOrdenCompraRepository repository;
     private final OrdenCompraAiRepository ordenRepository;
     private final ProductoRepository productoRepository;
 
+    @Override
     public DetalleOrdenCompra saveOrUpdate(DetalleOrdenCompra detalle) {
         if (detalle.getId() != null && !repository.existsById(detalle.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -41,19 +42,23 @@ public class DetalleOrdenCompraService {
         return repository.save(detalle);
     }
 
+    @Override
     public List<DetalleOrdenCompra> findAll() {
         return repository.findAll();
     }
 
+    @Override
     public DetalleOrdenCompra findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Detalle de orden no encontrado"));
     }
 
+    @Override
     public List<DetalleOrdenCompra> findByOrden(Long ordenId) {
         return repository.findByOrdenId(ordenId);
     }
 
+    @Override
     public void delete(Long id) {
         repository.deleteById(id);
     }

@@ -1,7 +1,7 @@
 package com.smartInventory.inventory_service.controllers;
 
 import com.smartInventory.inventory_service.models.Producto;
-import com.smartInventory.inventory_service.services.ProductoService;
+import com.smartInventory.inventory_service.services.ProductoServiceContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/api/v1/inventory")
 @RequiredArgsConstructor
 public class ProductoController {
-    private final ProductoService service;
+    private final ProductoServiceContract service;
 
     @GetMapping
     public ResponseEntity<List<Producto>> getAll() {

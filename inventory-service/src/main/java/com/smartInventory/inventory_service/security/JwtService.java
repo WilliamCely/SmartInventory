@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 
 @Service
-public class JwtService {
+public class JwtService implements JwtTokenService {
 
     private final SecretKey secretKey;
 
@@ -26,14 +26,17 @@ public class JwtService {
                 .getPayload();
     }
 
+    @Override
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
 
+    @Override
     public String extractRole(String token) {
         return extractAllClaims(token).get("role", String.class);
     }
 
+    @Override
     public boolean isTokenValid(String token) {
         try {
             extractAllClaims(token);

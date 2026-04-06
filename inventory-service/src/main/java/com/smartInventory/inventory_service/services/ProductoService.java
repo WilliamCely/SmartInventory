@@ -9,11 +9,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ProductoService {
+public class ProductoService implements ProductoServiceContract {
     private final ProductoRepository repository;
     private final AlertFactory alertFactory; // Tu patrón Factory
 
     // CREATE / UPDATE
+    @Override
     public Producto saveOrUpdate(Producto producto) {
         Producto guardado = repository.save(producto);
         verificarStockYNotificar(guardado);
@@ -21,17 +22,20 @@ public class ProductoService {
     }
 
     // READ ALL
+    @Override
     public List<Producto> findAll() {
         return repository.findAll();
     }
 
     // READ ONE
+    @Override
     public Producto findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }
 
     // DELETE
+    @Override
     public void delete(Long id) {
         repository.deleteById(id);
     }

@@ -2,7 +2,7 @@ package com.smartInventory.inventory_service.controllers;
 
 import com.smartInventory.inventory_service.models.EstadoOrdenCompra;
 import com.smartInventory.inventory_service.models.OrdenCompraAi;
-import com.smartInventory.inventory_service.services.OrdenCompraAiService;
+import com.smartInventory.inventory_service.services.OrdenCompraAiServiceContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrdenCompraAiController {
 
-    private final OrdenCompraAiService service;
+    private final OrdenCompraAiServiceContract service;
 
     @GetMapping
     public ResponseEntity<List<OrdenCompraAi>> getAll(@RequestParam(required = false) EstadoOrdenCompra estado) {
