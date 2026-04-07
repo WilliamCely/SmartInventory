@@ -1,5 +1,5 @@
 export interface Categoria {
-  id: number
+  id?: number
   nombre?: string
   descripcion?: string
 }
@@ -109,4 +109,20 @@ export interface DetalleOrdenCompraPayload {
   producto: { id: number }
   cantidadSugerida: number
   costoEstimado?: string
+}
+
+export interface ImportRowError {
+  row: number
+  sku?: string
+  message: string
+}
+
+export interface ProductosImportResult {
+  dryRun: boolean
+  totalRows: number
+  processedRows: number
+  createdProductos: number
+  updatedProductos: number
+  createdCategorias: number
+  errors: ImportRowError[]
 }

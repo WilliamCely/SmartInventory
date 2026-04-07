@@ -12,10 +12,18 @@ import java.util.List;
 public class ProductoService implements ProductoServiceContract {
     private final ProductoRepository repository;
     private final AlertFactory alertFactory; // Tu patrón Factory
+    private final AutoPurchaseSuggestionService autoPurchaseSuggestionService;
 
     // CREATE / UPDATE
     @Override
     public Producto saveOrUpdate(Producto producto) {
+        if (producto.getId() != null) {
+            Producto existente = repository.findById(producto.getId())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            // El stock actual se administra exclusivamente desde movimientos de inventario.
+            producto.setStockActual(existente.getStockActual());
+        }
+
         Producto guardado = repository.save(producto);
         verificarStockYNotificar(guardado);
         return guardado;
@@ -48,6 +56,12 @@ public class ProductoService implements ProductoServiceContract {
                 InventoryAlert alerta = alertFactory.getAlert("AI");
                 alerta.notify("Stock crítico detectado", p.getSku());
             });
+
+            try {
+                autoPurchaseSuggestionService.generateSuggestionIfNeeded(p);
+            } catch (Exception ignored) {
+                // No bloquea el CRUD de producto si la sugerencia automática falla.
+            }
         }
     }
 }

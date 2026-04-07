@@ -1,0 +1,7 @@
+sku,nombre,descripcion,precio,stock_actual,stock_minimo,categoria,categoria_descripcion
+SKU-TEST-001,Teclado mecánico RGB,Switch blue retroiluminado,189900,25,8,Periféricos,Dispositivos de entrada y salida
+SKU-TEST-002,Mouse ergonómico inalámbrico,Con receptor USB y batería recargable,129500,40,12,Periféricos,Dispositivos de entrada y salida
+SKU-TEST-003,Monitor 24 pulgadas IPS,Resolución Full HD 75Hz,749900,10,4,Monitores,Pantallas para estaciones de trabajo
+SKU-TEST-004,Disco SSD 1TB NVMe,Almacenamiento de alta velocidad,459900,18,6,Almacenamiento,Unidades para datos y respaldo
+SKU-TEST-005,Silla ergonómica oficina,Soporte lumbar y ajuste de altura,899000,7,3,Mobiliario,Muebles para estaciones de trabajo
+SKU-TEST-006,Base refrigerante para portátil,Con ventiladores duales y ajuste de inclinación,119900,15,5,Accesorios,Complementos de uso diario

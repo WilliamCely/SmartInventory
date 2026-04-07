@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/v1/inventory/import/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/inventory/**").hasAnyRole("ADMIN", "BODEGUERO")
                         .requestMatchers("/api/v1/inventory/usuarios/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/inventory/**").hasAnyRole("ADMIN", "BODEGUERO")

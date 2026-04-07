@@ -21,6 +21,8 @@ eureka:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
 
 app:
+  ai:
+    analysis-url: ${AI_ANALYSIS_URL:http://localhost:8080/api/v1/ai/analyze-stock}
   security:
     jwt:
       secret: ${JWT_SECRET:smartinventory-very-secret-key-change-in-prod-2026-1234567890}

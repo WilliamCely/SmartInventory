@@ -9,14 +9,20 @@ import type {
   OrdenCompraAi,
   OrdenCompraAiPayload,
   Producto,
+  ProductosImportResult,
   StockDataDTO,
   UsuarioOperativo,
 } from '../types/inventory'
 
 export const inventoryService = {
   getCategorias: () => api.get<Categoria[]>('/inventory/categorias'),
+  createCategoria: (categoria: Categoria) => api.post<Categoria>('/inventory/categorias', categoria),
+  updateCategoria: (id: number, categoria: Categoria) =>
+    api.put<Categoria>(`/inventory/categorias/${id}`, categoria),
+  deleteCategoria: (id: number) => api.delete(`/inventory/categorias/${id}`),
 
   getProductos: () => api.get<Producto[]>('/inventory'),
+  getProductoById: (id: number) => api.get<Producto>(`/inventory/${id}`),
   createProducto: (producto: Producto) => api.post('/inventory', producto),
   updateProducto: (id: number, producto: Producto) =>
     api.put(`/inventory/${id}`, producto),
@@ -59,4 +65,12 @@ export const inventoryService = {
   deleteUsuario: (id: number) => api.delete(`/inventory/usuarios/${id}`),
 
   analizarConIA: (data: StockDataDTO) => api.post('/ai/analyze-stock', data),
+
+  importProductosCsv: (file: File, dryRun = true) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post<ProductosImportResult>(`/inventory/import/productos?dryRun=${dryRun}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
 }

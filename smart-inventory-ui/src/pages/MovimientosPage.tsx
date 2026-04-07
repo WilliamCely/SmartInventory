@@ -35,10 +35,6 @@ function formatDate(value?: string) {
   }).format(new Date(value))
 }
 
-function movementDelta(tipo: TipoMovimiento, cantidad: number) {
-  return tipo === 'ENTRADA' ? cantidad : -cantidad
-}
-
 function MovimientosPage() {
   const { user } = useAuth()
 
@@ -146,36 +142,6 @@ function MovimientosPage() {
     setSuccess(null)
   }
 
-  const sincronizarStocks = async (ajustes: Array<{ productoId: number; delta: number }>) => {
-    const deltas = new Map<number, number>()
-    for (const ajuste of ajustes) {
-      deltas.set(ajuste.productoId, (deltas.get(ajuste.productoId) ?? 0) + ajuste.delta)
-    }
-
-    const productosAfectados = productos
-      .filter((producto) => producto.id != null && deltas.has(producto.id))
-      .map((producto) => {
-        const delta = deltas.get(producto.id as number) ?? 0
-        const stockObjetivo = Number(producto.stockActual ?? 0) + delta
-        return { producto, stockObjetivo }
-      })
-
-    const invalido = productosAfectados.find(({ stockObjetivo }) => stockObjetivo < 0)
-    if (invalido) {
-      throw new Error(`El stock de ${invalido.producto.nombre} no puede quedar en negativo`)
-    }
-
-    await Promise.all(
-      productosAfectados.map(({ producto, stockObjetivo }) => {
-        if (producto.id == null) return Promise.resolve()
-        return inventoryService.updateProducto(producto.id, {
-          ...producto,
-          stockActual: stockObjetivo,
-        })
-      }),
-    )
-  }
-
   const guardarMovimiento = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -215,22 +181,11 @@ function MovimientosPage() {
           return
         }
 
-        const productoAnteriorId = Number(movimientoEnEdicion.producto?.id)
-        const deltaAnterior = movementDelta(movimientoEnEdicion.tipo, movimientoEnEdicion.cantidad)
-        const deltaNuevo = movementDelta(form.tipo, cantidad)
-
         await inventoryService.updateMovimiento(editingMovimientoId, payload)
-        await sincronizarStocks([
-          { productoId: productoAnteriorId, delta: -deltaAnterior },
-          { productoId, delta: deltaNuevo },
-        ])
 
         setSuccess(`Movimiento actualizado correctamente para ${productoSeleccionado.nombre}`)
       } else {
-        const deltaNuevo = movementDelta(form.tipo, cantidad)
-
         await inventoryService.createMovimiento(payload)
-        await sincronizarStocks([{ productoId, delta: deltaNuevo }])
 
         setSuccess(
           `${form.tipo === 'ENTRADA' ? 'Entrada' : 'Salida'} registrada correctamente para ${productoSeleccionado.nombre}`,
@@ -259,11 +214,7 @@ function MovimientosPage() {
       setError(null)
       setSuccess(null)
 
-      const productoId = Number(movimiento.producto?.id)
-      const delta = movementDelta(movimiento.tipo, movimiento.cantidad)
-
       await inventoryService.deleteMovimiento(movimiento.id)
-      await sincronizarStocks([{ productoId, delta: -delta }])
 
       if (editingMovimientoId === movimiento.id) {
         resetForm()

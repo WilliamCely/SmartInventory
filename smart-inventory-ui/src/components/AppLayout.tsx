@@ -1,10 +1,12 @@
 import {
   BrainCircuit,
   Boxes,
+  ClipboardCheck,
   ClipboardList,
   LayoutDashboard,
   LogOut,
   Package,
+  Upload,
   UserCog,
 } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
@@ -13,9 +15,11 @@ import { useAuth } from '../auth/AuthContext'
 const links = [
   { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/app/productos', label: 'Productos', icon: Package },
+  { to: '/app/categorias', label: 'Categorías', icon: ClipboardCheck },
+  { to: '/app/importacion', label: 'Importación', icon: Upload, adminOnly: true },
   { to: '/app/ordenes', label: 'Ordenes AI', icon: BrainCircuit },
   { to: '/app/movimientos', label: 'Movimientos', icon: ClipboardList },
-  { to: '/app/usuarios', label: 'Usuarios', icon: UserCog },
+  { to: '/app/usuarios', label: 'Usuarios', icon: UserCog, adminOnly: true },
 ]
 
 function AppLayout() {
@@ -36,7 +40,9 @@ function AppLayout() {
           </div>
 
           <nav className="space-y-1">
-            {links.map((item) => {
+            {links
+              .filter((item) => !item.adminOnly || user?.role === 'ADMIN')
+              .map((item) => {
               const Icon = item.icon
               return (
                 <NavLink

@@ -1,0 +1,213 @@
+{
+  "info": {
+    "name": "SmartInventory RF01-RF05 Smoke",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Smoke tests para RF01-RF05 usando API Gateway"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "tokenAdmin", "value": "" },
+    { "key": "tokenBodeguero", "value": "" },
+    { "key": "categoriaId", "value": "" },
+    { "key": "productoId", "value": "" },
+    { "key": "movimientoId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login Admin",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/v1/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.expect(json).to.have.property('accessToken');",
+              "pm.collectionVariables.set('tokenAdmin', json.accessToken);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth - Login Bodeguero",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/v1/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"bodeguero\",\n  \"password\": \"bodega123\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.expect(json).to.have.property('accessToken');",
+              "pm.collectionVariables.set('tokenBodeguero', json.accessToken);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "RF01 - Crear categoría",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/inventory/categorias",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Categoria Smoke\",\n  \"descripcion\": \"Creada por smoke test\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('categoriaId', json.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "RF01 - Crear producto",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/inventory",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sku\": \"SKU-SMOKE-001\",\n  \"nombre\": \"Producto Smoke\",\n  \"descripcion\": \"Prueba RF01\",\n  \"precio\": 1000,\n  \"stockActual\": 20,\n  \"stockMinimo\": 5,\n  \"categoria\": { \"id\": {{categoriaId}} }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('productoId', json.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "RF01 - Obtener producto por id",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/inventory/{{productoId}}"
+      }
+    },
+    {
+      "name": "RF03 - Crear movimiento SALIDA",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/inventory/movimientos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"producto\": { \"id\": {{productoId}} },\n  \"usuario\": { \"id\": 1 },\n  \"tipo\": \"SALIDA\",\n  \"cantidad\": 16\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('movimientoId', json.id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "RF04 - Ver órdenes sugeridas",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/inventory/ordenes-compra?estado=SUGERIDA"
+      }
+    },
+    {
+      "name": "RF02 - Importación CSV dry-run (ADMIN)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/inventory/import/productos?dryRun=true",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "REEMPLAZAR_POR_RUTA_LOCAL_DEL_CSV"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "RF05 - Importación CSV prohibida para BODEGUERO",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{tokenBodeguero}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/inventory/import/productos?dryRun=true",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "REEMPLAZAR_POR_RUTA_LOCAL_DEL_CSV"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

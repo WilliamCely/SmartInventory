@@ -20,6 +20,11 @@ public class ProductoController {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Producto> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
     @PostMapping
     public ResponseEntity<Producto> create(@RequestBody Producto producto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.saveOrUpdate(producto));
