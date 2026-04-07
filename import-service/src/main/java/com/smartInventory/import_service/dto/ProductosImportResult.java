@@ -1,4 +1,4 @@
-package com.smartInventory.inventory_service.dto.imports;
+package com.smartInventory.import_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

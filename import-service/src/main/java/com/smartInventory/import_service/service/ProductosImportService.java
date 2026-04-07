@@ -1,17 +1,19 @@
-package com.smartInventory.inventory_service.services;
+package com.smartInventory.import_service.service;
 
-import com.smartInventory.inventory_service.dto.imports.ImportRowError;
-import com.smartInventory.inventory_service.dto.imports.ProductosImportResult;
-import com.smartInventory.inventory_service.models.Categoria;
-import com.smartInventory.inventory_service.models.Producto;
-import com.smartInventory.inventory_service.repositories.CategoriaRepository;
-import com.smartInventory.inventory_service.repositories.ProductoRepository;
+import com.smartInventory.import_service.client.InventoryApiClient;
+import com.smartInventory.import_service.dto.ImportRowError;
+import com.smartInventory.import_service.dto.ProductosImportResult;
+import com.smartInventory.import_service.dto.remote.CategoriaDto;
+import com.smartInventory.import_service.dto.remote.MovimientoCreateRequest;
+import com.smartInventory.import_service.dto.remote.ProductoDto;
+import com.smartInventory.import_service.dto.remote.UsuarioDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStreamReader;
@@ -26,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -40,29 +43,35 @@ public class ProductosImportService {
             "categoria"
     );
 
-    private final ProductoRepository productoRepository;
-    private final CategoriaRepository categoriaRepository;
+    private final InventoryApiClient inventoryApiClient;
 
-    @Transactional
-    public ProductosImportResult importCsv(MultipartFile file, boolean dryRun) {
+    public ProductosImportResult importCsv(MultipartFile file, boolean dryRun, String authorizationHeader) {
         List<ImportRowError> errors = new ArrayList<>();
 
         int totalRows = 0;
         int processedRows = 0;
         int createdProductos = 0;
         int updatedProductos = 0;
-        int createdCategorias = 0;
+        AtomicInteger createdCategorias = new AtomicInteger(0);
 
         if (file == null || file.isEmpty()) {
             errors.add(ImportRowError.builder()
                     .row(0)
                     .message("Archivo vacío o no proporcionado")
                     .build());
-            return buildResult(dryRun, totalRows, processedRows, createdProductos, updatedProductos, createdCategorias, errors);
+            return buildResult(dryRun, totalRows, processedRows, createdProductos, updatedProductos, createdCategorias.get(), errors);
         }
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication == null ? null : authentication.getName();
+        Long currentUserId = resolveCurrentUserId(username, authorizationHeader);
+
         Set<String> seenSkus = new HashSet<>();
-        Map<String, Categoria> categoriasCache = new HashMap<>();
+        Map<String, CategoriaDto> categoriasCache = new HashMap<>();
+        Map<String, ProductoDto> productosCache = new HashMap<>();
+
+        inventoryApiClient.getProductos(authorizationHeader).forEach(producto -> productosCache.put(normalize(producto.getSku()), producto));
+        inventoryApiClient.getCategorias(authorizationHeader).forEach(categoria -> categoriasCache.put(normalize(categoria.getNombre()), categoria));
 
         try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
              CSVParser parser = CSVFormat.DEFAULT.builder()
@@ -75,7 +84,7 @@ public class ProductosImportService {
 
             validarHeaders(parser.getHeaderMap(), errors);
             if (!errors.isEmpty()) {
-                return buildResult(dryRun, totalRows, processedRows, createdProductos, updatedProductos, createdCategorias, errors);
+                return buildResult(dryRun, totalRows, processedRows, createdProductos, updatedProductos, createdCategorias.get(), errors);
             }
 
             for (CSVRecord record : parser) {
@@ -92,7 +101,7 @@ public class ProductosImportService {
                     String descripcion = optional(record, "descripcion");
                     String categoriaDescripcion = optional(record, "categoria_descripcion");
 
-                    if (!seenSkus.add(sku.toLowerCase(Locale.ROOT))) {
+                    if (!seenSkus.add(normalize(sku))) {
                         throw new IllegalArgumentException("SKU duplicado dentro del archivo: " + sku);
                     }
                     if (stockActual < 0 || stockMinimo < 0) {
@@ -102,35 +111,34 @@ public class ProductosImportService {
                         throw new IllegalArgumentException("precio debe ser >= 0");
                     }
 
-                    Categoria categoria = resolveCategoria(categoriaNombre, categoriaDescripcion, categoriasCache, dryRun);
-                    if (categoria != null && categoria.getId() == null) {
-                        createdCategorias++;
-                    }
+                    ProductoDto existing = productosCache.get(normalize(sku));
+                    CategoriaDto categoria = resolveCategoria(categoriaNombre, categoriaDescripcion, categoriasCache, dryRun, authorizationHeader, createdCategorias);
 
-                    Optional<Producto> existing = productoRepository.findBySku(sku);
-                    Producto producto = existing.orElseGet(Producto::new);
+                    ProductoDto payload = ProductoDto.builder()
+                            .id(existing == null ? null : existing.getId())
+                            .sku(sku)
+                            .nombre(nombre)
+                            .descripcion(descripcion)
+                            .precio(precio)
+                            .stockActual(stockActual)
+                            .stockMinimo(stockMinimo)
+                            .categoria(categoria)
+                            .build();
 
-                    producto.setSku(sku);
-                    producto.setNombre(nombre);
-                    producto.setDescripcion(descripcion);
-                    producto.setPrecio(precio);
-                    producto.setStockActual(stockActual);
-                    producto.setStockMinimo(stockMinimo);
-                    producto.setCategoria(categoria);
-
-                    if (existing.isPresent()) {
-                        updatedProductos++;
-                    } else {
+                    if (existing == null) {
                         createdProductos++;
-                    }
-
-                    if (!dryRun) {
-                        if (categoria != null && categoria.getId() == null) {
-                            categoria = categoriaRepository.save(categoria);
-                            categoriasCache.put(categoriaNombre.toLowerCase(Locale.ROOT), categoria);
-                            producto.setCategoria(categoria);
+                        if (!dryRun) {
+                            ProductoDto created = inventoryApiClient.createProducto(payload, authorizationHeader);
+                            productosCache.put(normalize(created.getSku()), created);
                         }
-                        productoRepository.save(producto);
+                    } else {
+                        updatedProductos++;
+                        if (!dryRun) {
+                            ProductoDto updated = inventoryApiClient.updateProducto(existing.getId(), payload, authorizationHeader);
+                            productosCache.put(normalize(updated.getSku()), updated);
+
+                            ajustarStockSiEsNecesario(updated, stockActual, currentUserId, authorizationHeader);
+                        }
                     }
 
                     processedRows++;
@@ -149,7 +157,37 @@ public class ProductosImportService {
                     .build());
         }
 
-        return buildResult(dryRun, totalRows, processedRows, createdProductos, updatedProductos, createdCategorias, errors);
+        return buildResult(dryRun, totalRows, processedRows, createdProductos, updatedProductos, createdCategorias.get(), errors);
+    }
+
+    private void ajustarStockSiEsNecesario(ProductoDto producto, Integer stockObjetivo, Long usuarioId, String authorizationHeader) {
+        Integer stockActual = producto.getStockActual() == null ? 0 : producto.getStockActual();
+        int delta = stockObjetivo - stockActual;
+        if (delta == 0) {
+            return;
+        }
+
+        MovimientoCreateRequest movimiento = MovimientoCreateRequest.builder()
+                .producto(MovimientoCreateRequest.Ref.builder().id(producto.getId()).build())
+                .usuario(MovimientoCreateRequest.Ref.builder().id(usuarioId).build())
+                .tipo(delta > 0 ? "ENTRADA" : "SALIDA")
+                .cantidad(Math.abs(delta))
+                .build();
+
+        inventoryApiClient.createMovimiento(movimiento, authorizationHeader);
+    }
+
+    private Long resolveCurrentUserId(String username, String authorizationHeader) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalStateException("No se pudo resolver el usuario autenticado");
+        }
+
+        Optional<UsuarioDto> usuario = inventoryApiClient.getUsuarios(authorizationHeader).stream()
+                .filter(u -> username.equalsIgnoreCase(u.getUsername()))
+                .findFirst();
+
+        return usuario.map(UsuarioDto::getId)
+                .orElseThrow(() -> new IllegalStateException("No se encontró un usuario operativo para: " + username));
     }
 
     private void validarHeaders(Map<String, Integer> headerMap, List<ImportRowError> errors) {
@@ -168,34 +206,32 @@ public class ProductosImportService {
         }
     }
 
-    private Categoria resolveCategoria(
+    private CategoriaDto resolveCategoria(
             String nombre,
             String descripcion,
-            Map<String, Categoria> cache,
-            boolean dryRun
+            Map<String, CategoriaDto> cache,
+            boolean dryRun,
+                String authorizationHeader,
+                AtomicInteger createdCategorias
     ) {
-        String key = nombre.toLowerCase(Locale.ROOT);
+        String key = normalize(nombre);
 
         if (cache.containsKey(key)) {
             return cache.get(key);
         }
 
-        Optional<Categoria> existing = categoriaRepository.findByNombre(nombre);
-        if (existing.isPresent()) {
-            cache.put(key, existing.get());
-            return existing.get();
-        }
-
-        Categoria nueva = Categoria.builder()
+        CategoriaDto nueva = CategoriaDto.builder()
                 .nombre(nombre)
                 .descripcion(descripcion)
                 .build();
 
-        cache.put(key, nueva);
+        createdCategorias.incrementAndGet();
 
         if (!dryRun) {
-            return nueva;
+            nueva = inventoryApiClient.createCategoria(nueva, authorizationHeader);
         }
+
+        cache.put(key, nueva);
         return nueva;
     }
 
@@ -248,5 +284,9 @@ public class ProductosImportService {
         } catch (Exception ex) {
             throw new IllegalArgumentException("Valor decimal inválido: " + value);
         }
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 }

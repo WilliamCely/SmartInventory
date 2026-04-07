@@ -1,4 +1,4 @@
-package com.smartInventory.inventory_service.dto.imports;
+package com.smartInventory.import_service.dto.remote;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ImportRowError {
-    private long row;
-    private String sku;
-    private String message;
+public class UsuarioDto {
+    private Long id;
+    private String username;
+    private String role;
 }
