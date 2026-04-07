@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import logoImage from '../assets/inventory-logo.svg'
 
 function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
 
-  const [username, setUsername] = useState('admin')
-  const [password, setPassword] = useState('admin123')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -29,12 +30,16 @@ function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-slate-900 px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+        className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
       >
-        <h1 className="mb-2 text-2xl font-bold text-slate-900">Iniciar sesión</h1>
-        <p className="mb-6 text-sm text-slate-500">
-          Autenticación JWT via backend (admin/admin123 o bodeguero/bodega123)
-        </p>
+        <img
+          src={logoImage}
+          alt="Logo de inventario"
+          className="absolute right-4 top-4 h-10 w-10 rounded-md border border-slate-200 bg-slate-50 p-1"
+        />
+
+        <h1 className="mb-2 pr-16 text-2xl font-bold text-slate-900">Iniciar sesión</h1>
+        <p className="mb-6 text-sm text-slate-500">Ingresa tus credenciales para continuar.</p>
 
         <label className="mb-2 block text-sm font-medium text-slate-700">
           Usuario
@@ -43,7 +48,7 @@ function LoginPage() {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="mb-4 w-full rounded-lg border border-slate-300 px-3 py-2"
-          placeholder="admin"
+          placeholder="Tu usuario"
         />
 
         <label className="mb-2 block text-sm font-medium text-slate-700">
