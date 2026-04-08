@@ -64,14 +64,43 @@ public class ProductosImportService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication == null ? null : authentication.getName();
-        Long currentUserId = resolveCurrentUserId(username, authorizationHeader);
+        
+        Long currentUserId;
+        try {
+            currentUserId = resolveCurrentUserId(username, authorizationHeader);
+        } catch (Exception ex) {
+            errors.add(ImportRowError.builder()
+                    .row(0)
+                    .message("Error al resolver usuario autenticado: " + ex.getMessage())
+                    .build());
+            return buildResult(dryRun, totalRows, processedRows, createdProductos, updatedProductos, createdCategorias.get(), errors);
+        }
 
         Set<String> seenSkus = new HashSet<>();
         Map<String, CategoriaDto> categoriasCache = new HashMap<>();
         Map<String, ProductoDto> productosCache = new HashMap<>();
 
-        inventoryApiClient.getProductos(authorizationHeader).forEach(producto -> productosCache.put(normalize(producto.getSku()), producto));
-        inventoryApiClient.getCategorias(authorizationHeader).forEach(categoria -> categoriasCache.put(normalize(categoria.getNombre()), categoria));
+        try {
+            inventoryApiClient.getProductos(authorizationHeader).forEach(producto -> productosCache.put(normalize(producto.getSku()), producto));
+        } catch (Exception ex) {
+            errors.add(ImportRowError.builder()
+                    .row(0)
+                    .message("Error al obtener productos existentes: " + ex.getMessage())
+                    .build());
+        }
+        
+        try {
+            inventoryApiClient.getCategorias(authorizationHeader).forEach(categoria -> categoriasCache.put(normalize(categoria.getNombre()), categoria));
+        } catch (Exception ex) {
+            errors.add(ImportRowError.builder()
+                    .row(0)
+                    .message("Error al obtener categorías existentes: " + ex.getMessage())
+                    .build());
+        }
+
+        if (!errors.isEmpty()) {
+            return buildResult(dryRun, totalRows, processedRows, createdProductos, updatedProductos, createdCategorias.get(), errors);
+        }
 
         try (Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
              CSVParser parser = CSVFormat.DEFAULT.builder()

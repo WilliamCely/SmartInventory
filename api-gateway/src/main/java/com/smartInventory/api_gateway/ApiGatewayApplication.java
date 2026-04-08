@@ -24,6 +24,7 @@ public class ApiGatewayApplication {
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
 				.route("auth-service", r -> r.path("/api/v1/auth/**").uri("lb://auth-service"))
+				.route("import-service", r -> r.path("/api/v1/inventory/import/**").uri("lb://import-service"))
 				.route("inventory-service", r -> r.path("/api/v1/inventory/**").uri("lb://inventory-service"))
 				.route("ai-service", r -> r.path("/api/v1/ai/**").uri("lb://ai-service"))
 				.build();
