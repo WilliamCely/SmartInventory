@@ -3,7 +3,9 @@ package com.smartInventory.inventory_service.services;
 import com.smartInventory.inventory_service.models.Producto;
 import com.smartInventory.inventory_service.repositories.ProductoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,10 +14,11 @@ import java.util.List;
 public class ProductoService implements ProductoServiceContract {
     private final ProductoRepository repository;
     private final AlertFactory alertFactory; // Tu patrón Factory
-    private final AutoPurchaseSuggestionService autoPurchaseSuggestionService;
+    private final ApplicationEventPublisher eventPublisher;
 
     // CREATE / UPDATE
     @Override
+    @Transactional
     public Producto saveOrUpdate(Producto producto) {
         if (producto.getId() != null) {
             Producto existente = repository.findById(producto.getId())
@@ -57,11 +60,7 @@ public class ProductoService implements ProductoServiceContract {
                 alerta.notify("Stock crítico detectado", p.getSku());
             });
 
-            try {
-                autoPurchaseSuggestionService.generateSuggestionIfNeeded(p);
-            } catch (Exception ignored) {
-                // No bloquea el CRUD de producto si la sugerencia automática falla.
-            }
+            eventPublisher.publishEvent(new StockReorderRequestedEvent(p.getId()));
         }
     }
 }
