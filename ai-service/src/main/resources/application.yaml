@@ -11,6 +11,9 @@ spring:
           project-id: ${GOOGLE_CLOUD_PROJECT_ID:smart-inventory-dev}
           location: ${GOOGLE_CLOUD_LOCATION:us-central1}
           model: ${VERTEX_GEMINI_MODEL:gemini-1.5-flash}
+          chat:
+            options:
+              model: ${VERTEX_GEMINI_MODEL:gemini-1.5-flash}
 server:
   port: 8082
 eureka:

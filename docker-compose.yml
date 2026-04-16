@@ -67,10 +67,15 @@ services:
     restart: always
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      GOOGLE_CLOUD_PROJECT_ID: ${GOOGLE_CLOUD_PROJECT_ID:-smart-inventory-dev}
-      GOOGLE_CLOUD_LOCATION: ${GOOGLE_CLOUD_LOCATION:-us-central1}
-      VERTEX_GEMINI_MODEL: ${VERTEX_GEMINI_MODEL:-gemini-1.5-flash}
+      EUREKA_INSTANCE_HOSTNAME: ai-service
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      GOOGLE_CLOUD_PROJECT_ID: ${GOOGLE_CLOUD_PROJECT_ID}
+      GOOGLE_CLOUD_LOCATION: ${GOOGLE_CLOUD_LOCATION}
+      VERTEX_GEMINI_MODEL: ${VERTEX_GEMINI_MODEL}
+      GOOGLE_APPLICATION_CREDENTIALS: /app/keys/gcp-sa.json
       # En cloud, la autenticación debe venir de Service Account / Workload Identity.
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS_HOST_PATH}:/app/keys/gcp-sa.json:ro
     depends_on:
       - eureka-server
 

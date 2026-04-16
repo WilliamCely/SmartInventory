@@ -25,4 +25,10 @@ public class StockAnalysisService implements StockAnalysisServiceContract {
         Prompt prompt = new Prompt(new UserMessage(promptText));
         return chatModel.call(prompt).getResult().getOutput().getText();
     }
+
+    @Override
+    public String pingModel() {
+        Prompt prompt = new Prompt(new UserMessage("Responde solo OK"));
+        return chatModel.call(prompt).getResult().getOutput().getText();
+    }
 }
