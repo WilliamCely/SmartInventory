@@ -39,6 +39,27 @@ public class OrdenCompraAiService implements OrdenCompraAiServiceContract {
                         "usuarioAprobador.id no existe: " + usuarioId);
             }
         }
+
+        // Si es update, conservar los datos originales que no vienen en el payload
+        if (orden.getId() != null) {
+            var existente = repository.findById(orden.getId());
+            if (existente.isPresent()) {
+                var dbOrden = existente.get();
+                if (orden.getFechaGeneracion() == null) {
+                    orden.setFechaGeneracion(dbOrden.getFechaGeneracion());
+                }
+                if (orden.getPromptUsado() == null) {
+                    orden.setPromptUsado(dbOrden.getPromptUsado());
+                }
+                if (orden.getRespuestaRawJson() == null) {
+                    orden.setRespuestaRawJson(dbOrden.getRespuestaRawJson());
+                }
+                if (orden.getEstado() == null) {
+                    orden.setEstado(dbOrden.getEstado());
+                }
+            }
+        }
+
         return repository.save(orden);
     }
 

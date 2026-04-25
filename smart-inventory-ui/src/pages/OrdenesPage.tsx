@@ -311,6 +311,8 @@ function OrdenesPage() {
       usuarioAprobador: ordenForm.usuarioAprobadorId
         ? { id: Number(ordenForm.usuarioAprobadorId) }
         : undefined,
+      // Siempre enviar la fecha original al editar
+      fechaGeneracion: editingOrdenId ? ordenSeleccionada?.fechaGeneracion : undefined,
     }
 
     try {

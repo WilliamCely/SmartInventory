@@ -36,7 +36,7 @@ CREATE TABLE movimientos_inventario (
 
 CREATE TABLE ordenes_compra_ai (
     id SERIAL PRIMARY KEY,
-    fecha_generacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_generacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     prompt_usado TEXT,
     respuesta_raw_json JSONB,
     estado VARCHAR(20) DEFAULT 'SUGERIDA' CHECK (estado IN ('SUGERIDA', 'APROBADA', 'RECHAZADA')),

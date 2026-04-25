@@ -19,7 +19,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "ordenes_compra_ai")
@@ -33,8 +34,8 @@ public class OrdenCompraAi {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fecha_generacion", nullable = false)
-    private LocalDateTime fechaGeneracion;
+    @Column(name = "fecha_generacion", nullable = false, updatable = false)
+    private ZonedDateTime fechaGeneracion;
 
     @Column(name = "prompt_usado", columnDefinition = "TEXT")
     private String promptUsado;
@@ -54,7 +55,7 @@ public class OrdenCompraAi {
     @PrePersist
     protected void onCreate() {
         if (fechaGeneracion == null) {
-            fechaGeneracion = LocalDateTime.now();
+            fechaGeneracion = ZonedDateTime.now(ZoneId.of("America/Santiago"));
         }
         if (estado == null) {
             estado = EstadoOrdenCompra.SUGERIDA;
